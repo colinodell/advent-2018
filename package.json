@@ -1,0 +1,17 @@
+{
+  "name": "colinodell-advent-2018",
+  "version": "0.1.0",
+  "description": "My solutions to adventofcode.com 2018 challenges",
+  "homepage": "https://github.com/colinodell/advent-2018",
+  "main": "index.js",
+  "author": "Colin O'Dell <colinodell@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "lint": "eslint .",
+    "test": "mocha day*/test*.js"
+  },
+  "devDependencies": {
+    "eslint": "^5.9.0",
+    "mocha": "^5.2.0"
+  }
+}
