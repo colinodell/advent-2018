@@ -1,9 +1,9 @@
-const day01 = require('./day01'),
+const day01 = require('./code'),
   assert = require('assert'),
   fs = require('fs'),
   path = require('path');
 
-const dataFilePath = path.join(__dirname, '/day1.txt');
+const dataFilePath = path.join(__dirname, '/data.txt');
 
 describe('Day 1 - Chronal Calibration', () => {
   describe('Part 1', () => {

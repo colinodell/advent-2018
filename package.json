@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
     "lint": "eslint .",
-    "test": "mocha day*/test*.js"
+    "test": "mocha day*/test.js"
   },
   "dependencies": {
     "js-levenshtein": "^1.1.4"

@@ -1,4 +1,4 @@
-const day02 = require('./day02'),
+const day02 = require('./code'),
   assert = require('assert'),
   fs = require('fs'),
   path = require('path');
