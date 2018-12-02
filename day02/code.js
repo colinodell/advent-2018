@@ -28,22 +28,24 @@ const countFrequencies = (str) => {
   return {'has2': has2, 'has3': has3};
 };
 
+const sumFrequencies = (ret, cnt) => {
+  if (cnt.has2) {
+    ret[0]++;
+  }
+
+  if (cnt.has3) {
+    ret[1]++;
+  }
+
+  return ret;
+};
+
 const calculateChecksum = (data) => {
-  const counts = data.split(/[\r\n]+/).map(countFrequencies);
-
-  let cnt2 = 0;
-  let cnt3 = 0;
-
-  counts.forEach((cnt) => {
-    if (cnt.has2) {
-      cnt2++;
-    }
-    if (cnt.has3) {
-      cnt3++;
-    }
-  });
-
-  return cnt2 * cnt3;
+  return data
+    .split(/[\r\n]+/)
+    .map(countFrequencies)
+    .reduce(sumFrequencies, [0, 0])
+    .reduce((prev, current) => prev * current, 1);
 };
 
 const similarChars = (a, b) => {
