@@ -10,6 +10,9 @@
     "lint": "eslint .",
     "test": "mocha day*/test*.js"
   },
+  "dependencies": {
+    "js-levenshtein": "^1.1.4"
+  },
   "devDependencies": {
     "eslint": "^5.9.0",
     "mocha": "^5.2.0"
