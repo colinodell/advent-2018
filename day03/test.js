@@ -18,4 +18,17 @@ describe('Day 3 - No Matter How You Slice It', () => {
       });
     });
   });
+
+  describe('Part 2', () => {
+    it('should properly find the one non-overlapping claim', () => {
+      // eslint-disable-next-line quotes
+      assert.equal(day03.findFirstNonOverlappingClaim("#1 @ 1,3: 4x4\n#2 @ 3,1: 4x4\n#3 @ 5,5: 2x2", 10, 10), 3);
+
+      fs.readFile(dataFilePath, (err, data) => {
+        if (err) throw err;
+
+        assert.equal(day03.findFirstNonOverlappingClaim(data.toString(), 1000, 1000), 943);
+      });
+    });
+  });
 });
