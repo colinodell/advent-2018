@@ -1,9 +1,6 @@
 const day02 = require('./code'),
   assert = require('assert'),
-  fs = require('fs'),
-  path = require('path');
-
-const dataFilePath = path.join(__dirname, '/data.txt');
+  withDataFile = require('../common').withDataFile;
 
 describe('Day 2 - Inventory Management System', () => {
   describe('Part 1', () => {
@@ -11,9 +8,7 @@ describe('Day 2 - Inventory Management System', () => {
       // eslint-disable-next-line quotes
       assert.equal(day02.calculateChecksum("abcdef\nbababc\nabbcde\nabcccd\naabcdd\nabcdee\nababab"), 12);
 
-      fs.readFile(dataFilePath, (err, data) => {
-        if (err) throw err;
-
+      withDataFile(__dirname, 'data.txt', (data) => {
         assert.equal(day02.calculateChecksum(data.toString()), 8892);
       });
     });
@@ -24,9 +19,7 @@ describe('Day 2 - Inventory Management System', () => {
       // eslint-disable-next-line quotes
       assert.equal(day02.findCommonLettersInCorrectBoxIds("abcde\nfghij\nklmno\npqrst\nfguij\naxcye\nwvxyz"), 'fgij');
 
-      fs.readFile(dataFilePath, (err, data) => {
-        if (err) throw err;
-
+      withDataFile(__dirname, 'data.txt', (data) => {
         assert.equal(day02.findCommonLettersInCorrectBoxIds(data.toString()), 'zihwtxagifpbsnwleydukjmqv');
       });
     });

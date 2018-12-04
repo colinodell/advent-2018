@@ -1,9 +1,6 @@
 const day03 = require('./code'),
   assert = require('assert'),
-  fs = require('fs'),
-  path = require('path');
-
-const dataFilePath = path.join(__dirname, '/data.txt');
+  withDataFile = require('../common').withDataFile;
 
 describe('Day 3 - No Matter How You Slice It', () => {
   describe('Part 1', () => {
@@ -11,9 +8,7 @@ describe('Day 3 - No Matter How You Slice It', () => {
       // eslint-disable-next-line quotes
       assert.equal(day03.countOverlappingClaims("#1 @ 1,3: 4x4\n#2 @ 3,1: 4x4\n#3 @ 5,5: 2x2", 10, 10), 4);
 
-      fs.readFile(dataFilePath, (err, data) => {
-        if (err) throw err;
-
+      withDataFile(__dirname, 'data.txt', (data) => {
         assert.equal(day03.countOverlappingClaims(data.toString(), 1000, 1000), 121163);
       });
     });
@@ -24,9 +19,7 @@ describe('Day 3 - No Matter How You Slice It', () => {
       // eslint-disable-next-line quotes
       assert.equal(day03.findFirstNonOverlappingClaim("#1 @ 1,3: 4x4\n#2 @ 3,1: 4x4\n#3 @ 5,5: 2x2", 10, 10), 3);
 
-      fs.readFile(dataFilePath, (err, data) => {
-        if (err) throw err;
-
+      withDataFile(__dirname, 'data.txt', (data) => {
         assert.equal(day03.findFirstNonOverlappingClaim(data.toString(), 1000, 1000), 943);
       });
     });
