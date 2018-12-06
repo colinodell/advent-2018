@@ -1,86 +1,67 @@
 const _ = require('lodash');
 
-class SleepPeriod {
-  constructor (id, asleepMinute, awakeMinute) {
+class Guard {
+  constructor (id) {
     this.id = id;
-    this.asleepMinute = asleepMinute;
-    this.awakeMinute = awakeMinute;
+    this._sleepRecord = Array(60).fill(0);
+    this._lastAsleep = null;
   }
 
-  duration () {
-    return this.awakeMinute - this.asleepMinute;
+  markAsleep (asleepAt) {
+    this._lastAsleep = asleepAt;
+  }
+
+  markAwake (awakeAt) {
+    for (let minute = this._lastAsleep; minute < awakeAt; minute++) {
+      this._sleepRecord[minute]++;
+    }
+  }
+
+  findSleepiestMinute () {
+    return _.chain(this._sleepRecord)
+      .map((sleeps, minute) => ({'sleeps': sleeps, 'minute': minute}))
+      .sortBy('sleeps')
+      .reverse()
+      .first()
+      .value();
+  }
+
+  totalSleepDuration () {
+    return _.sum(this._sleepRecord);
   }
 }
 
 class SleepRecordBook {
   constructor () {
-    this._sleepsByGuard = new Map();
+    this.guards = {};
   }
 
-  /**
-   * @param {SleepPeriod} sleepPeriod
-   */
-  add (sleepPeriod) {
-    if (!this._sleepsByGuard.has(sleepPeriod.id)) {
-      this._sleepsByGuard.set(sleepPeriod.id, []);
+  getById (guardId) {
+    if (this.guards[guardId]) {
+      return this.guards[guardId];
     }
 
-    this._sleepsByGuard.get(sleepPeriod.id).push(sleepPeriod);
+    let g = new Guard(guardId);
+    this.guards[guardId] = g;
+    return g;
   }
 
-  getGuardIds () {
-    return Array.from(this._sleepsByGuard.keys());
-  }
-
-  findSleepiestGuard () {
-    /**
-     * @param {SleepPeriod[]} sleeps
-     */
-    const reduceSleepsToFindSleepiest = ([id, sleeps]) => {
-      return [id, sleeps.reduce((totalDuration, sleep) => totalDuration += sleep.duration(), 0)];
-    };
-
-    const sleepiestGuardId = _
-      .chain([...this._sleepsByGuard])
-      .map(reduceSleepsToFindSleepiest)
-      // eslint-disable-next-line no-unused-vars
-      .sortBy(([id, duration]) => duration)
+  findGuardWhoSleepsTheMostOverall () {
+    return _.chain(this.guards)
+      .sortBy((g) => g.totalSleepDuration())
       .last()
+      .value();
+  }
+
+  findGuardWhoSleepsTheMostInTheSameMinute () {
+    return _.chain(this.guards)
+      .mapValues((guard) => guard.findSleepiestMinute())
+      .toPairs()
+      .sortBy((v) => v[1].sleeps)
+      .reverse()
+      .map(([id]) => this.getById(id))
       .first()
       .value();
-
-    return sleepiestGuardId;
-  }
-
-  findSleepiestMinuteByGuard (guardId) {
-    /**
-     * @param {Array} collector
-     * @param {SleepPeriod} s
-     */
-    const addMinutesAsleep = (collector, s) => {
-      for (let i = s.asleepMinute; i < s.awakeMinute; i++) {
-        if (!collector.has(i)) {
-          collector.set(i, 0);
-        }
-
-        collector.set(i, collector.get(i) + 1);
-      }
-
-      return collector;
-    };
-
-    const sleeps = this._sleepsByGuard.get(guardId);
-
-    const sleepiestMinute = _
-      .chain(sleeps)
-      .reduce(addMinutesAsleep, new Map())
-      .thru((m) => [...m])
-      .map((v) => { return { 'minute': v[0], 'sleeps': v[1]}; })
-      .sortBy('sleeps')
-      .last()
-      .value();
-
-    return sleepiestMinute;
   }
 }
 
@@ -89,10 +70,8 @@ const sortAndParseLogs = (data) => {
 
   const rgx = /\[\d+-\d+-\d+ \d+:(\d+)\] (?:Guard #)?(\d+|falls asleep|wakes up)/;
 
-  let lastGuardId = 0;
-  let lastSleepTime = 0;
-
   const slr = new SleepRecordBook();
+  let currentGuard = null;
 
   for (let i = 0; i < data.length; i++) {
     let r = rgx.exec(data[i]);
@@ -101,11 +80,11 @@ const sortAndParseLogs = (data) => {
     let action = r[2];
 
     if (action === 'falls asleep') {
-      lastSleepTime = minute;
+      currentGuard.markAsleep(minute);
     } else if (action === 'wakes up') {
-      slr.add(new SleepPeriod(lastGuardId, lastSleepTime, minute));
+      currentGuard.markAwake(minute);
     } else {
-      lastGuardId = parseInt(action);
+      currentGuard = slr.getById(parseInt(action));
     }
   }
 
@@ -115,27 +94,17 @@ const sortAndParseLogs = (data) => {
 const multiplySleepiestGuardIdByMinute = (data) => {
   const slr = sortAndParseLogs(data);
 
-  const sleepiestGuardId = slr.findSleepiestGuard();
-  const sleepiestMinute = slr.findSleepiestMinuteByGuard(sleepiestGuardId);
+  const sleepiestGuard = slr.findGuardWhoSleepsTheMostOverall();
 
-  return sleepiestGuardId * sleepiestMinute.minute;
+  return sleepiestGuard.id * sleepiestGuard.findSleepiestMinute().minute;
 };
 
 const findOverallSleepiestGuardMinute = (data) => {
   const slr = sortAndParseLogs(data);
 
-  let sleepiest = {'sleeps': -1};
+  const guard = slr.findGuardWhoSleepsTheMostInTheSameMinute();
 
-  slr.getGuardIds().forEach((guardId) => {
-    let sleepiestMinute = slr.findSleepiestMinuteByGuard(guardId);
-
-    if (sleepiestMinute.sleeps > sleepiest.sleeps) {
-      sleepiest = sleepiestMinute;
-      sleepiest.guardId = guardId;
-    }
-  });
-
-  return sleepiest.guardId * sleepiest.minute;
+  return guard.id * guard.findSleepiestMinute().minute;
 };
 
 module.exports = {
