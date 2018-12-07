@@ -6,7 +6,7 @@ const withDataFile = (directory, filename, callback) => {
   fs.readFile(dataFilePath, (err, data) => {
     if (err) throw err;
 
-    callback(data.toString());
+    callback(data.toString().trim());
   });
 };
 
