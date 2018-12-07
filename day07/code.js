@@ -27,7 +27,7 @@ const determineCorrectSteps = (data) => {
 
   const correctOrder = [];
 
-  // eslint-ignore-next-line no-constant-condition
+  // eslint-disable-next-line no-constant-condition
   while (true) {
     // Which steps can be completed next?
     let nextSteps = Object.keys(requirements).filter((step) => requirements[step].length === 0).sort();
