@@ -21,4 +21,14 @@ describe('Day 6 - Chronal Coordinates', () => {
       });
     });
   });
+
+  describe('Part 2', () => {
+    it('should calculate the correct safe region size', () => {
+      assert.equal(day06.calculateSafeRegionSize(sampleData, 32), 16);
+
+      withDataFile(__dirname, 'data.txt', (data) => {
+        assert.equal(day06.calculateSafeRegionSize(data, 10000), 42123);
+      });
+    });
+  });
 });

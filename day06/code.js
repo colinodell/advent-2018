@@ -59,6 +59,31 @@ const calculateLargestFiniteArea = (data) => {
     .value();
 };
 
+const calculateSafeRegionSize = (data, distanceLimit) => {
+  const coordinates = parseCoordinates(data);
+
+  const maxX = _.maxBy(coordinates, (c) => c[0])[0];
+  const maxY = _.maxBy(coordinates, (c) => c[1])[1];
+
+  let regionSize = 0;
+
+  for (let x = 0; x <= maxX; x++) {
+    for (let y = 0; y <= maxY; y++) {
+      let totalDistance = _.chain((new Array(coordinates.length)).fill(null))
+        .map((value, index) => calculateDistance(coordinates[index], [x,y]))
+        .sum()
+        .value();
+
+      if (totalDistance < distanceLimit) {
+        regionSize++;
+      }
+    }
+  }
+
+  return regionSize;
+};
+
 module.exports = {
   'calculateLargestFiniteArea': calculateLargestFiniteArea,
+  'calculateSafeRegionSize': calculateSafeRegionSize,
 };
