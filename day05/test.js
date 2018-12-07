@@ -14,4 +14,14 @@ describe('Day 5 - Alchemical Reduction', () => {
       });
     });
   });
+
+  describe('Part 2', () => {
+    it('should find the shorted improved polymer', () => {
+      assert.equal(day05.improvePolymer(sampleData), 'daDA');
+
+      withDataFile(__dirname, 'data.txt', (data) => {
+        assert.equal(day05.improvePolymer(data).length, 5492);
+      });
+    });
+  });
 });
